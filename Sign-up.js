@@ -1,5 +1,25 @@
 //Werkt nog nie, js kut.
 
+const express = require("express");
+const fs = require("fs");
+const cors = require("cors");
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+app.use(express.static("public"));
+
+const FILE = "accounts.json";
+
+function getUsers() {
+    if (!fs.existsSync(FILE)) return {};
+    return JSON.parse(fs.readFileSync(FILE));
+}
+
+function saveUsers(users) {
+    fs.writeFileSync(FILE, JSON.stringify(users, null, 2));
+}
+
 function print(message){
     console.log(message);
 }
@@ -13,9 +33,8 @@ function submitForm() {
         alert("Please fill in all fields.");
         return;
     }
-    fetch("accounts.json")
-    .then(response => response.json())
-    .then(accounts => {
+    try{
+        let accounts = getUsers();
         if (username in accounts) {
             alert(`Username ${username} is already taken.`);
             return;
@@ -24,13 +43,12 @@ function submitForm() {
         "password": password,
         "email": email
         };
-        fetch("/accounts.json", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(accounts)
-        });
-    });
-    //window.location.href = "Sign-up.html";
+        saveUsers(accounts);
+        //window.location.href = "Sign-up.html";
+    }
+    catch(error){
+        alert("Error fetching accounts data: " + error);
+        return;
+    }
+    
 }
