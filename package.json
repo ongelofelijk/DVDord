@@ -1,0 +1,27 @@
+{
+  "name": "dvdord",
+  "version": "1.0.0",
+  "description": "Discord voor een potato pc.\r Net als jij.\r Ja, jij ja.\r Niemand gaat dit lezen...\r Ruben doet mee.\r Ruben deed geen flikker.",
+  "main": "Sign-up.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ongelofelijk/DVDord.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ongelofelijk/DVDord/issues"
+  },
+  "homepage": "https://github.com/ongelofelijk/DVDord#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "fs": "^0.0.1-security"
+  }
+}
