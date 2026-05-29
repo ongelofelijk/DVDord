@@ -9,6 +9,15 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
 
+function CheckPassword(password) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    return minLength <= password.length && hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+}
+
 const FILE = "accounts.json";
 
 function getUsers() {
