@@ -20,8 +20,10 @@
   "homepage": "https://github.com/ongelofelijk/DVDord#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
     "fs": "^0.0.1-security"
   }
 }
