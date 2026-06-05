@@ -33,6 +33,27 @@ function submitForm() {
             alert("Please enter a valid email")
             return
         }
+        const payload = {
+            username= username,
+            password= password,
+            email=  email
+        }
+        const response = await fetch('window.location.href/api/sign-up', {method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        console.log('boom')
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        
+        alert('SUCCES!')
+
+    
     }
     catch(error){
         alert("Error fetching accounts data: " + error);
