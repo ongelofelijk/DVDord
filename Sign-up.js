@@ -10,7 +10,7 @@ function CheckPassword(password) {
 function CheckEmail(email) {
     const hasThingIDontKnowTheNameOf = /[@]/.test(email);
     const emailSplit = email.split("@");
-    const hasDot = /[.]/.test(emailSplit[-1]);
+    const hasDot = /[.]/.test(emailSplit.at(-1));
     return hasThingIDontKnowTheNameOf && hasDot;
 }
 
