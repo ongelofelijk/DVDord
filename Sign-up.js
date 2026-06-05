@@ -18,11 +18,6 @@ function submitForm() {
         return;
     }
     try{
-        let accounts = getUsers();
-        if (username in accounts) {
-            alert(`Username ${username} is already taken.`);
-            return;
-        }
         if (CheckPassword(password) === false){
             alert("Password does not meet the requirements:\n- At least 8 characters\n- At least one uppercase character\n- At least one lowercase character\n- At least one special character\n- At least one digit")
             return;
