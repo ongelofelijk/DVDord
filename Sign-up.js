@@ -7,6 +7,13 @@ function CheckPassword(password) {
     return minLength <= password.length && hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
 }
 
+function CheckEmail(email) {
+    const hasThingIDontKnowTheNameOf = /[@]/.test(email);
+    const emailSplit = email.split("@");
+    const hasDot = /[.]/.test(emailSplit.at(-1));
+    return hasThingIDontKnowTheNameOf && hasDot;
+}
+
 function submitForm() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
@@ -18,11 +25,14 @@ function submitForm() {
         return;
     }
     try{
-        if (CheckPassword(password) === false){
+        if (!CheckPassword(password)){
             alert("Password does not meet the requirements:\n- At least 8 characters\n- At least one uppercase character\n- At least one lowercase character\n- At least one special character\n- At least one digit")
             return;
         }
-        //window.location.href = "Sign-up.html";
+        if (!CheckEmail(email)){
+            alert("Please enter a valid email")
+            return
+        }
     }
     catch(error){
         alert("Error fetching accounts data: " + error);
