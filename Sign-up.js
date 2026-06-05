@@ -9,8 +9,8 @@ function CheckPassword(password) {
 
 function CheckEmail(email) {
     const hasThingIDontKnowTheNameOf = /[@]/.test(email)
-    const emailSplit = email.split("@")[-1]
-    const hasDot = /[.]/.test(emailSplit)
+    const emailSplit = email.split("@")
+    const hasDot = /[.]/.test(emailSplit[-1])
     return hasThingIDontKnowTheNameOf && hasDot;
 }
 
@@ -29,7 +29,7 @@ function submitForm() {
             alert("Password does not meet the requirements:\n- At least 8 characters\n- At least one uppercase character\n- At least one lowercase character\n- At least one special character\n- At least one digit")
             return;
         }
-        if (!CheckEmail){
+        if (!CheckEmail(email)){
             alert("Please enter a valid email")
             return
         }
