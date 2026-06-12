@@ -1,38 +1,69 @@
-let http = require('http');
-
 //Werkt nog nie, js kut.
+// werkt soort van js is nie kut
+// hoe maak je een chat database????????????????????????!!!!!!!!!!!!!!!!!!!!
 
 const express = require("express");
 const fs = require("fs");
 const session = require('express-session');
-
+const bcrypt = require('bcrypt');
 const cors = require("cors");
-
+require('dotenv').config();
 const app = express();
 app.use(express.json());
 app.use(cors());
 const adminPassword =process.env.ADMIN_PASSWORD|| 'test';
-const cookieParser = require('cookie-parser');
-app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.urlencoded({ extended: true }));
 const mysql = require('mysql2/promise');
+// aaa yes
 
+app.use(session({
+  name: 'session_id',
+  secret: process.env.SESSION_SECRET || 'supersecret', 
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,   
+    secure: true, 
+    sameSite: 'none' 
+  }
+}));
 let dataBase;
+
+
 (async () => {
   dataBase = await mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'your_db'
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.MY_SQL_PASSWORD,
+    database: process.env.DB_NAME || 'your_db',
+    waitForConnections: true,
+    connectionLimit: 10
   });
-})();
 
-app.use(express.static("public"));
-http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Hello World!');
-}).listen(8080); 
-console.log('Server running at http://localhost:8080/');
+  // Maak de gebruikerstabel aan
+  await dataBase.execute(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255),
+      username VARCHAR(255),
+      password VARCHAR(255)
+    )
+  `);
+
+  // HIER IS DE CHATDATABASE/TABEL TOEGEVOEGD
+  await dataBase.execute(`
+    CREATE TABLE IF NOT EXISTS messages (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT,
+      message TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
+  console.log('Database + tables ready');
+})();
 
 function getUsers() {
     if (!fs.existsSync(FILE)) return {};
@@ -44,14 +75,60 @@ function saveUsers(users) {
 }
 
 async function usernameExists(username) {
-  const [rows] = await dataBase.execute(
+    const [rows] = await dataBase.execute(
     'SELECT id FROM users WHERE username = ?',
     [username]
-  );
-  return rows.length > 0;
+    );
+    return rows.length > 0;
+}
+function requireLogin(req, res, next) {
+  console.log('try')
+    if (req.session.user) {
+      console.log(req.session.user)
+      return next();}
+      
+    res.redirect('/login');
 }
 
-app.POST('/api/sign-up', async (req, res)=> {
+app.use('/me', requireLogin);
+
+
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    console.log('missing')
+    return res.status(400).send('Missing fields');
+  }
+
+  const [rows] = await dataBase.execute(
+    'SELECT * FROM users WHERE username = ?',
+    [username]
+  );
+
+  if (rows.length === 0) {
+    console.log('invallid user')
+    return res.status(401).send('Invalid credentials');
+  }
+
+  const user = rows[0];
+
+  const match = await bcrypt.compare(password, user.password);
+
+  if (!match) {
+    console.log('invalid pass')
+    return res.status(401).send('Invalid credentials');
+  }
+
+  req.session.user = {
+    id: user.id,
+    username: user.username
+  };
+res.send('ok');});
+
+
+
+app.post('/api/sign-up', async (req, res)=> {
     const { email, username, password } = req.body;
 
     if (!email || !username || !password) {
@@ -71,7 +148,29 @@ app.POST('/api/sign-up', async (req, res)=> {
 
     res.send('User created');
 })
+app.get('/me', requireLogin, (req, res) => {
+  res.json({
+    id: req.session.user.id,
+    username: req.session.user.username
+  });
+});
+app.post('/api/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Could not log out');
+    }
+    res.clearCookie('session_id', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none'
+    });
+    res.send('ok');
+  });
+});
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
-app.listen(PORT, HOST, () => console.log(`Server listening on http://${HOST}:${PORT} (serving files from ${__dirname})`));
-app.use(express.static(__dirname));
+app.listen(PORT, HOST, () => console.log(`Server listening on http://${HOST}:${PORT} (serving files from public)`));
+app.get('/', (req, res) => {
+  res.redirect('/home/');
+});
+app.use(express.static("public"));

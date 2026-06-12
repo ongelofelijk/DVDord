@@ -14,7 +14,7 @@ function CheckEmail(email) {
     return hasThingIDontKnowTheNameOf && hasDot;
 }
 
-function submitForm() {
+async function submitForm() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
     let email = document.getElementById("email").value;
@@ -34,11 +34,11 @@ function submitForm() {
             return
         }
         const payload = {
-            username= username,
-            password= password,
-            email=  email
+            username: username,
+            password: password,
+            email:  email
         }
-        const response = await fetch('window.location.href/api/sign-up', {method: 'POST',
+        const response = await fetch('https://dvdord.onrender.com/api/sign-up', {method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -46,10 +46,11 @@ function submitForm() {
         })
         console.log('boom')
         if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
+            const responseText= await  response.text()
+            throw new Error(`Server error: ${response.status}, with error: ${responseText}`);
         }
 
-        const responseData = await response.json();
+        const responseData = await response.text();
         
         alert('SUCCES!')
 

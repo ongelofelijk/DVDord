@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 350px;
+}
+
+.header-section {
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 3.5rem;
+  letter-spacing: 2px;
+  color: #00adb5;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #8f9aa2;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.button-container {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 26px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-login {
+  background-color: #00adb5;
+  color: #ffffff;
+}
+
+.btn-login:hover {
+  background-color: #008c92;
+}
+
+.btn-signup {
+  background-color: #393e46;
+  color: #eeeeee;
+  border: 1px solid #4e5561;
+}
+
+.btn-signup:hover {
+  background-color: #2e3238;
+}
+
+.btn-dashboard {
+  background-color: #7289da;
+  color: #ffffff;
+}
+
+.btn-dashboard:hover {
+  background-color: #5b73c7;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+footer {
+  margin-top: 2rem;
+}
+
+footer p {
+  font-size: 0.85rem;
+  color: #4e5561;
+}
