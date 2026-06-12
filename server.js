@@ -10,7 +10,24 @@ const cors = require("cors");
 require('dotenv').config();
 const app = express();
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = [
+  'http://127.0.0.1:3000',
+  'http://localhost:3000',
+  'https://evilborb.github.io'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
 const adminPassword =process.env.ADMIN_PASSWORD|| 'test';
 app.use(express.urlencoded({ extended: true }));
 const mysql = require('mysql2/promise');
@@ -18,15 +35,16 @@ const mysql = require('mysql2/promise');
 
 app.use(session({
   name: 'session_id',
-  secret: process.env.SESSION_SECRET || 'supersecret', 
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,   
-    secure: true, 
-    sameSite: 'none' 
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
   }
 }));
+
 let dataBase;
 
 
@@ -83,17 +101,19 @@ async function usernameExists(username) {
 }
 function requireLogin(req, res, next) {
   console.log('try')
-    if (req.session.user) {
-      console.log(req.session.user)
-      return next();}
-      
-    res.redirect('/login');
+  if (req.session.user) {
+    console.log(req.session.user)
+    
+    return next();}
+  console.log("not logged in")
+  res.redirect('/login');
+  
 }
 
-app.use('/me', requireLogin);
 
 
 app.post('/api/login', async (req, res) => {
+  console.log('ehho')
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -119,12 +139,12 @@ app.post('/api/login', async (req, res) => {
     console.log('invalid pass')
     return res.status(401).send('Invalid credentials');
   }
-
+  console.log('succes')
   req.session.user = {
     id: user.id,
     username: user.username
   };
-res.send('ok');});
+res.redirect('/me');});
 
 
 
@@ -148,12 +168,7 @@ app.post('/api/sign-up', async (req, res)=> {
 
     res.send('User created');
 })
-app.get('/me', requireLogin, (req, res) => {
-  res.json({
-    id: req.session.user.id,
-    username: req.session.user.username
-  });
-});
+
 app.post('/api/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -173,4 +188,15 @@ app.listen(PORT, HOST, () => console.log(`Server listening on http://${HOST}:${P
 app.get('/', (req, res) => {
   res.redirect('/home/');
 });
+app.get('/api/me', (req, res) => {
+  if (!req.session.user) {
+    return res.status(403).json({ error: 'not logged in' });
+  }
+
+  res.json({
+    id: req.session.user.id,
+    username: req.session.user.username
+  });
+})
+app.use('/me', requireLogin);
 app.use(express.static("public"));
